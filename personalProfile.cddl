@@ -1,0 +1,114 @@
+start = personalProfile
+
+image = bytes
+url = tstr .regexp "(https?)://[^\s/$.?#].[^\s]*"
+
+socialLink = { ; A group to specify a social media link
+  socialLinkType: tstr, ; Implementations must provide this as a choice of contemporary and popular social media types including an option, such as 'other' for the user to specify a custom name for the social link.
+  ? customSocialLinkType: tstr, ; If 'other' is chosen as a socialLinkType then this optional field is used to specify the name of the social media.
+  ? caption: tstr, ; An optional caption for the social link.
+  linkURL: url, ; A URL to the social media profile.
+}
+
+picture = { ; A group to specify an image, such as a profile picture.
+  caption: tstr, ; A caption that can be used as alternative text for accessibility.
+  * description: tstr, ; An optional description of the image.
+  imageData: image, ; The actual image in binary format or a reference to some other data type in binary.
+  ? attribution: tstr, ; An optional attribution, if necessary.
+  ? attributionURL: url, ; An optional URL for the attribution, if necessary.
+  keywords: [*tstr], ; An optional array of keywords associated with this image.
+}
+
+
+skill = { ; A group describing a skill and its level. This group is not for describing skills in natural languages.
+  skill: tstr, ; The name of the skill.
+  ? note: tstr, ; Optional note about the skill.
+  level: int, ; The level of this skill. Implementations can specify the bounds for the level and also map them to specific choices.
+  keywords: [*tstr], ; An optional array of keywords associated with this skill.
+}
+
+languageSkill = { ; A group to describe a natural language skill
+  languageSkill: tstr, ; Name of the natural language, e.g., English.
+  ? locale: tstr, ; Name of the locale or regional dialect, such as United Kingdom. The value does not need to conform to two or three letter locale codes.
+  ; The following describe the reading, writing, listening and speaking levels. In each case, implementations can specify the bounds for the level and also map them to specific choices.
+  readingLevel: int,
+  writingLevel: int,
+  listeningLevel: int,
+  speakingLevel: int,
+}
+
+contributionAuthor = { ; A group to describe a contributing author, such as to a publication or a project.
+  authorType: {
+    "person" => {
+        personName: personName,
+        ? orcid: tstr,
+    } // 
+    "organisation" => {
+        organisationName: tstr,
+    }
+  },
+  ? webURL: url,
+  ? image: picture,
+}
+
+project = { ; A group to describe a project relating to a personal profile.
+  name: tstr, ; Name of the project.
+  ? webURL: url, ; Optional URL for this project.
+  ? startDate: tdate, ; Optional start date.
+  ? endDate: tdate, ; Optional end date.
+  * description: tstr, ; Optional description of the project.
+  skills: [*skill], ; Optional skills (not natural language skills) learned or used.
+  contributors: [*contributionAuthor], ; Optional contributors of the project, excluding self.
+  representativePicture: picture, ; Representative image for this project.
+  otherPictures: [*picture], ; Other optional images related to this project.
+  keywords: [*tstr], ; An optional array of keywords associated with this project.
+}
+
+
+education = { ; A group to describe an educational qualification.
+  institution: tstr, ; The name of the institution in charge of issuing the qualification.
+  ? degree: tstr, ; Optional name of the degree obtained.
+  ? fieldOfStudy: tstr, ; Optional field of study related to this qualification.
+  ? startDate: tdate, ; Optional start date.
+  ? endDate: tdate, ; Optional end date.
+  ? grade: tstr, ; Optional grade obtained.
+  * summary: tstr, ; Optional description about this educational qualification.
+  * extracurricular: tstr, ; Optional description about the extracurricular activities associated with this educational qualification.
+  skills: [*skill], ; Optional skills (not natural language skills) learned or used.
+}
+
+experience = { ; A group to describe a work or voluntary experience.
+  title: tstr, ; The title or designation held during this experience, e.g., 'Research Fellow'.
+  name: tstr, ; The name of the organisation related to this experience.
+  ? location: tstr, ; Optional location of the organisation or its relevant branch office.
+  ? webURL: url, ; Optional website of the organisation.
+  ? experienceType: int, ; Optional type of experience. Implementations must constrain the possible values and obtain it as a choice.
+  ? startDate: tdate, ; Optional start date.
+  ? endDate: tdate, ; Optional end date.
+  ? workStyle: int, ; Optional type of work, such as "remote", "hybrid", "on-site". Implementations must constrain the possible values and obtain it as a choice.
+  * description: tstr, ; Optional description of this experience.
+  skills: [*skill], ; Optional list of skills (not natural languages) learnt or used during this experience.
+  relatedProjects: [*project], ; Optional list of projects related to this experience.
+  keywords: [*tstr], ; An optional array of keywords associated with this experience.
+}
+
+personName = { ; A common group for describing names of human entities.
+  familyName: tstr, ; A mandatory family name.
+  givenNames: [+tstr], ; One or more given names.
+  ? pronouns: tstr, ; Optional preferred pronouns. Implementations can obtain this from a choice of common pronouns with the option to specify 'other'.
+  ? pronunciation: tstr, ; An optional pronunciation of the name.
+}
+
+personalProfile = { ; A group to represent the personal profile.
+  name: personName, ; Name of the person represented in this profile.
+  headline: tstr, ; A succinct headline for this person, such as "A theoretical researcher in quantum spectroscopy".
+  * summary: tstr, ; Optional description about this profile.
+  experience: [*experience], ; Optional list of work or voluntary experiences.
+  education: [*education], ; Optional list of educational qualifications.
+  projects: [*project], ; Optional list of projects.
+  skills: [*skill], ; Optional list of skills.
+  languageSkills: [*languageSkill], ; Optional list of language skills.
+  profileImage: picture, ; Profile picture.
+  socialLinks: [*socialLink], ; Optional list of social media links.
+  keywords: [*tstr], ; An optional array of keywords associated with this profile.
+}
